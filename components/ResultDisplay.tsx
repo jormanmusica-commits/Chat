@@ -91,7 +91,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ results, searchWor
           {results.occurrences.map((occurrence) => (
             <li key={occurrence.lineNumber} className="bg-gray-900 p-3 rounded-md border border-gray-700 font-mono text-sm text-gray-300">
               <span className="text-gray-500 mr-3 select-none">{occurrence.lineNumber}:</span>
-              <HighlightedText text={occurrence.lineContent} highlights={[contextWord, searchWord]} />
+              <HighlightedText text={occurrence.lineContent} highlights={[searchWord]} />
             </li>
           ))}
         </ul>
