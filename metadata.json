@@ -1,0 +1,5 @@
+{
+  "name": "Buscador de Palabras en Chat",
+  "description": "Una aplicación para analizar archivos de texto grandes, como registros de chat de WhatsApp, para encontrar y contar las apariciones de una palabra específica dicha por una persona específica.",
+  "requestFramePermissions": []
+}
