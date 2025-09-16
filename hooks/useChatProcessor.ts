@@ -28,7 +28,8 @@ export const useChatProcessor = () => {
           const occurrences: SearchResult[] = [];
 
           const word1Regex = new RegExp(`\\b${word1.trim().replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
-          const word2Regex = new RegExp(`\\b${word2.trim().replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
+          // Removed word boundaries (\b) from word2Regex to allow partial matching
+          const word2Regex = new RegExp(`${word2.trim().replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}`, 'i');
 
           lines.forEach((line, index) => {
             if (word1Regex.test(line) && word2Regex.test(line)) {

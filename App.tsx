@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ChangeEvent } from 'react';
+import React, { useState, useCallback, ChangeEvent, useEffect } from 'react';
 import { Card } from './components/Card';
 import { Input } from './components/Input';
 import { Button } from './components/Button';
@@ -32,10 +32,34 @@ function App() {
     e.target.value = '';
   };
 
-  const handleAnalyze = async () => {
+  const isFormValid = chatText.trim() !== '' && contextWord.trim() !== '' && searchWord.trim() !== '';
+
+  const handleAnalyze = useCallback(async () => {
+    if (!isFormValid) return;
     const analysisResults = await processChat(chatText, contextWord, searchWord);
     setResults(analysisResults);
-  };
+  }, [isFormValid, chatText, contextWord, searchWord, processChat]);
+
+  useEffect(() => {
+    const isReadyForSearch = chatText.trim() !== '' && contextWord.trim() !== '';
+
+    if (!isReadyForSearch) {
+        return;
+    }
+
+    // Clear results if search word is emptied
+    if (searchWord.trim() === '') {
+        if(results) setResults(null);
+        return;
+    }
+
+    const debounceTimer = setTimeout(() => {
+        handleAnalyze();
+    }, 300); // 300ms delay for live search
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchWord, contextWord, chatText, handleAnalyze]);
+
 
   const handleReset = () => {
     setChatText('');
@@ -44,8 +68,6 @@ function App() {
     setFileName(null);
     setResults(null);
   }
-
-  const isFormValid = chatText.trim() !== '' && contextWord.trim() !== '' && searchWord.trim() !== '';
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-4 sm:p-6 lg:p-8">
@@ -101,7 +123,10 @@ function App() {
                   label="Definir Palabra"
                   placeholder="ej., Cote"
                   value={contextWord}
-                  onChange={(e) => setContextWord(e.target.value)}
+                  onChange={(e) => {
+                    setContextWord(e.target.value)
+                    setResults(null);
+                  }}
                   icon={<SearchIcon />}
                 />
                 <Input
