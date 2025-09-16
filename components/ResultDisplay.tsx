@@ -8,6 +8,8 @@ interface ResultDisplayProps {
   searchWord: string;
   contextWord: string;
   isLoading: boolean;
+  startDate?: string;
+  endDate?: string;
 }
 
 const HighlightedText: React.FC<{ text: string; highlights: string[] }> = ({ text, highlights }) => {
@@ -35,7 +37,7 @@ const HighlightedText: React.FC<{ text: string; highlights: string[] }> = ({ tex
 };
 
 
-export const ResultDisplay: React.FC<ResultDisplayProps> = ({ results, searchWord, contextWord, isLoading }) => {
+export const ResultDisplay: React.FC<ResultDisplayProps> = ({ results, searchWord, contextWord, isLoading, startDate, endDate }) => {
   if (isLoading) {
     return (
       <Card className="flex flex-col items-center justify-center h-full">
@@ -65,6 +67,12 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ results, searchWor
       </Card>
     );
   }
+  
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  }
 
   if (results.count === 0) {
     return (
@@ -72,7 +80,15 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ results, searchWor
             <SearchIcon className="h-16 w-16 text-gray-600 mb-4" />
             <h3 className="text-2xl font-bold text-gray-300">No se Encontraron Resultados</h3>
             <p className="text-gray-400 mt-2 max-w-sm">
-                No se encontraron líneas que contengan ambas palabras: "<strong className="text-teal-400">{contextWord}</strong>" y "<strong className="text-teal-400">{searchWord}</strong>".
+                No se encontraron líneas que contengan "<strong className="text-teal-400">{contextWord}</strong>" y "<strong className="text-teal-400">{searchWord}</strong>"
+                {(startDate || endDate) && (
+                    <span className="block mt-2">
+                        en el rango de fechas: 
+                        {startDate && <strong className="text-teal-400"> {formatDate(startDate)}</strong>}
+                        {(startDate && endDate) && ' - '}
+                        {endDate && <strong className="text-teal-400"> {formatDate(endDate)}</strong>}
+                    </span>
+                )}.
             </p>
       </Card>
     );

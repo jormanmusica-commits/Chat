@@ -11,6 +11,8 @@ function App() {
   const [chatText, setChatText] = useState<string>('');
   const [contextWord, setContextWord] = useState<string>('');
   const [searchWord, setSearchWord] = useState<string>('');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [fileName, setFileName] = useState<string | null>(null);
   const [results, setResults] = useState<AnalysisResult | null>(null);
 
@@ -36,9 +38,9 @@ function App() {
 
   const handleAnalyze = useCallback(async () => {
     if (!isFormValid) return;
-    const analysisResults = await processChat(chatText, contextWord, searchWord);
+    const analysisResults = await processChat(chatText, contextWord, searchWord, startDate, endDate);
     setResults(analysisResults);
-  }, [isFormValid, chatText, contextWord, searchWord, processChat]);
+  }, [isFormValid, chatText, contextWord, searchWord, startDate, endDate, processChat]);
 
   useEffect(() => {
     const isReadyForSearch = chatText.trim() !== '' && contextWord.trim() !== '';
@@ -47,7 +49,6 @@ function App() {
         return;
     }
 
-    // Clear results if search word is emptied
     if (searchWord.trim() === '') {
         if(results) setResults(null);
         return;
@@ -55,16 +56,18 @@ function App() {
 
     const debounceTimer = setTimeout(() => {
         handleAnalyze();
-    }, 300); // 300ms delay for live search
+    }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchWord, contextWord, chatText, handleAnalyze]);
+  }, [searchWord, contextWord, chatText, startDate, endDate, handleAnalyze]);
 
 
   const handleReset = () => {
     setChatText('');
     setContextWord('');
     setSearchWord('');
+    setStartDate('');
+    setEndDate('');
     setFileName(null);
     setResults(null);
   }
@@ -138,6 +141,30 @@ function App() {
                   icon={<SearchIcon />}
                 />
               </div>
+
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-gray-300 mb-1">Filtrar por Fecha (Opcional)</h3>
+                <hr className="border-gray-700 mb-4"/>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Input
+                        id="start-date"
+                        label="Fecha de Inicio"
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        max={endDate || ''}
+                    />
+                    <Input
+                        id="end-date"
+                        label="Fecha de Fin"
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        min={startDate || ''}
+                    />
+                </div>
+              </div>
+
             </Card>
 
             <div className="grid grid-cols-2 gap-4">
@@ -153,7 +180,14 @@ function App() {
 
           {/* Results Section */}
           <div className="min-h-[600px] lg:h-auto">
-             <ResultDisplay results={results} searchWord={searchWord} contextWord={contextWord} isLoading={isLoading} />
+             <ResultDisplay 
+                results={results} 
+                searchWord={searchWord} 
+                contextWord={contextWord} 
+                isLoading={isLoading} 
+                startDate={startDate}
+                endDate={endDate}
+             />
           </div>
         </main>
       </div>
